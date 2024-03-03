@@ -2,14 +2,25 @@ from datetime import datetime
 from typing import List
 
 from database import get_connection
-from models import ProductInDB
+from models import ProductInDB, ProductUpdate
 
 
 def execute_query(query: str, params: tuple = None):
-    with get_connection().cursor() as cursor:
-        cursor.execute(query, params)
-        get_connection().commit()
-        return cursor.fetchall()
+    conn = get_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(query, params)
+            if cursor.description:
+                results = cursor.fetchall()
+            else:
+                results = cursor.rowcount
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        raise e
+    finally:
+        conn.close()
+    return results
 
 
 def create_product_from_data(data: tuple) -> ProductInDB:
@@ -39,9 +50,15 @@ def fetch_product(id: int) -> ProductInDB:
 
 
 def create_product(product: ProductInDB):
-    query = "INSERT INTO public.product (name, description, company, price, units, subcategory_id) VALUES (%s, %s, %s, %s, %s, %s)"
+    if not subcategory_exists(product.subcategory_id):
+        return {"message": "Subcategory not found", "success": False}
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    query = "INSERT INTO public.product (name, description, company, price, units, subcategory_id, created_at, updated_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
     execute_query(query, (
-        product.name, product.description, product.company, product.price, product.units, product.subcategory_id))
+        product.name, product.description, product.company, product.price, product.units, product.subcategory_id,
+        current_time, current_time))
+
+    return {"message": "Added successfully", "success": True}
 
 
 def product_exists(id: int) -> bool:
@@ -56,19 +73,25 @@ def subcategory_exists(id: int) -> bool:
     return bool(data)
 
 
-def update_product(id: int, product: ProductInDB):
+def update_product(id: int, product: ProductUpdate):
     if not product_exists(id) or not subcategory_exists(product.subcategory_id):
         return {"message": "Product or subcategory not found"}
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     query = "UPDATE public.product SET name = %s, description = %s, company = %s, price = %s, units = %s, subcategory_id = %s, updated_at = %s WHERE product_id = %s"
-    execute_query(query, (
+    rows_affected = execute_query(query, (
         product.name, product.description, product.company, product.price, product.units, product.subcategory_id,
         current_time, id))
-    return {"message": "Successfully modified"}
+
+    if rows_affected > 0:
+        return {"message": "Successfully modified"}
+    else:
+        return {"message": "Update operation failed"}
 
 
 def delete_product(id: int):
+    if not product_exists(id):
+        return {"message": "Product not found", "success": False}
     query = "DELETE FROM public.product WHERE product_id = %s"
     execute_query(query, (id,))
-    return {"message": "Deleted successfully"}
+    return {"message": "Deleted successfully", "success": True}
