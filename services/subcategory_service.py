@@ -15,8 +15,8 @@ def fetch_subcategory(subcategory_id):
 
 def create_subcategory(subcategory):
     with get_connection().cursor() as cursor:
-        cursor.execute("INSERT INTO public.subcategory (name, category_id) VALUES (%s, %s)",
-                       (subcategory.name, subcategory.category_id))
+        cursor.execute("INSERT INTO public.subcategory (subcategory_id, name, category_id) VALUES (%s, %s, %s)",
+                       (subcategory.subcategory_id, subcategory.name, subcategory.category_id))
     get_connection().commit()
     return cursor.rowcount > 0
 
