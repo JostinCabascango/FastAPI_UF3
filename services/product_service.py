@@ -1,8 +1,10 @@
 from datetime import datetime
 from typing import List
+import csv
 
 from database import get_connection
-from models import ProductInDB, ProductUpdate
+from models import ProductInDB, ProductUpdate, ProductSubcategoryCategory, Category, Subcategory, ProductCreateCSV
+from services import category_service, subcategory_service
 
 
 def execute_query(query: str, params: tuple = None):
@@ -95,3 +97,96 @@ def delete_product(id: int):
     query = "DELETE FROM public.product WHERE product_id = %s"
     execute_query(query, (id,))
     return {"message": "Deleted successfully", "success": True}
+
+
+def fetch_products_orderby(orderby):
+    if orderby not in ["asc", "desc"]:
+        raise ValueError("Valor inválido para ordenar. Se esperaba 'asc' o 'desc'.")
+
+    query = f"""
+    SELECT category.name, subcategory.name, product.name, product.company, product.price
+    FROM public.product
+    INNER JOIN public.subcategory ON product.subcategory_id = subcategory.subcategory_id
+    INNER JOIN public.category ON subcategory.category_id = category.category_id
+    ORDER BY product.name {orderby}
+    """
+    data = execute_query(query)
+    return [create_product_with_subcategory_from_data(product_data) for product_data in data]
+
+
+def fetch_products_contain(name):
+    query = f"""
+    SELECT category.name, subcategory.name, product.name, product.company, product.price
+    FROM public.product
+    INNER JOIN public.subcategory ON product.subcategory_id = subcategory.subcategory_id
+    INNER JOIN public.category ON subcategory.category_id = category.category_id
+    WHERE product.name LIKE %s
+    """
+    data = execute_query(query, (f"%{name}%",))
+    return [create_product_with_subcategory_from_data(product_data) for product_data in data]
+
+
+def fetch_products_skip_limit(skip, limit):
+    query = f"""
+    SELECT category.name, subcategory.name, product.name, product.company, product.price
+    FROM public.product
+    INNER JOIN public.subcategory ON product.subcategory_id = subcategory.subcategory_id
+    INNER JOIN public.category ON subcategory.category_id = category.category_id
+    Limit %s Offset %s
+    """
+    data = execute_query(query, (limit, skip))
+    return [create_product_with_subcategory_from_data(product_data) for product_data in data]
+
+
+def create_product_with_subcategory_from_data(data: tuple) -> ProductSubcategoryCategory:
+    return ProductSubcategoryCategory(
+        category_name=data[0],
+        subcategory_name=data[1],
+        product_name=data[2],
+        product_brand=data[3],
+        price=data[4]
+    )
+
+
+async def create_or_update_product(product):
+    if not product_exists(product.product_id):
+        create_product(product)
+    else:
+        update_product(product.product_id, product)
+
+
+async def load_products(file):
+    try:
+        contents = await file.read()
+        reader = csv.reader(contents.decode("utf-8").splitlines(), delimiter=",")
+        next(reader)
+        for row in reader:
+            category = Category(
+                category_id=row[0],
+                name=row[1],
+                created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                updated_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            )
+            subcategory = Subcategory(
+                subcategory_id=int(row[2]),
+                name=row[3],
+                category_id=int(row[0]),
+                created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                updated_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            )
+            product = ProductCreateCSV(
+                product_id=int(row[4]),
+                name=row[5],
+                description=row[6],
+                company=row[7],
+                price=float(row[8]),
+                units=int(row[9]),
+                subcategory_id=int(row[2])
+            )
+            category_service.create_or_update_category(category)
+            subcategory_service.create_or_update_subcategory(subcategory)
+            create_or_update_product(product)
+    except Exception as e:
+        return {"message": "Error loading products", "success": False}
+
+    return {"message": "Products loaded successfully", "success": True}

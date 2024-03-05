@@ -39,3 +39,10 @@ def category_exists(category_id):
     with get_connection().cursor() as cursor:
         cursor.execute("SELECT * FROM public.category WHERE category_id = %s", (category_id,))
         return bool(cursor.fetchone())
+
+
+async def create_or_update_category(category):
+    if not category_exists(category.category_id):
+        create_category(category)
+    else:
+        update_category(category.category_id, category)

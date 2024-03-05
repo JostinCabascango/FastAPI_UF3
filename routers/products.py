@@ -1,6 +1,5 @@
 from typing import List
-import csv
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File, Query
 from models import ProductCreate, ProductUpdate, ProductInDB, Category, Subcategory, ProductCreateCSV
 from services import product_service, category_service, subcategory_service
 
@@ -44,45 +43,19 @@ async def delete_product(id: int):
 
 @router.post("/loadProducts/")
 async def load_products(file: UploadFile = File(...)):
-    try:
-        content = await file.read()
-        reader = csv.reader(content.decode('utf-8').splitlines(), delimiter=',')
-        next(reader)
-        for row in reader:
-            category = Category(
-                category_id=int(row[0]),
-                name=row[1]
-            )
-            subcategory = Subcategory(
-                subcategory_id=int(row[2]),
-                name=row[3],
-                category_id=int(row[0])
-            )
-            product = ProductCreateCSV(
-                product_id=int(row[4]),
-                name=row[5],
-                description=row[6],
-                company=row[7],
-                price=float(row[8]),
-                units=int(row[9]),
-                subcategory_id=int(row[2])
-            )
-            if not category_service.category_exists(category.category_id):
-                category_service.create_category(category)
-            else:
-                category_service.update_category(category.category_id, category)
+    return await product_service.load_products(file)
 
-            if not subcategory_service.subcategory_exists(subcategory.subcategory_id):
-                subcategory_service.create_subcategory(subcategory)
-            else:
-                subcategory_service.update_subcategory(subcategory.subcategory_id, subcategory)
 
-            if not product_service.product_exists(product.product_id):
-                product_service.create_product(product)
-            else:
-                product_service.update_product(product.product_id, product)
+@router.get("/products/orderby/")
+async def get_products_orderby(orderby: str = Query(None, enum=["asc", "desc"])):
+    return product_service.fetch_products_orderby(orderby)
 
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Invalid file: {str(e)}")
 
-    return {"message": "Data loaded successfully"}
+@router.get("/products/contain/")
+async def get_products_contain(name: str):
+    return product_service.fetch_products_contain(name)
+
+
+@router.get("/products/skip_limit/")
+async def get_products_skip_limit(skip: int, limit: int):
+    return product_service.fetch_products_skip_limit(skip, limit)

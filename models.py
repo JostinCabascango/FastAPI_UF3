@@ -2,12 +2,12 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class BaseModel(BaseModel):
+class BaseModelTimestamp(BaseModel):
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
 
 
-class ProductBase(BaseModel):
+class ProductBase(BaseModelTimestamp):
     name: str
     description: str
     company: str
@@ -28,16 +28,24 @@ class ProductUpdate(ProductBase):
     pass
 
 
-class ProductInDB(ProductBase, BaseModel):
+class ProductInDB(ProductBase, BaseModelTimestamp):
     product_id: int
 
 
-class Category(BaseModel):
+class Category(BaseModelTimestamp):
     category_id: int
     name: str
 
 
-class Subcategory(BaseModel):
+class Subcategory(BaseModelTimestamp):
     subcategory_id: int
     name: str
     category_id: int
+
+
+class ProductSubcategoryCategory(BaseModel):
+    category_name: str
+    subcategory_name: str
+    product_name: str
+    product_brand: str
+    price: float

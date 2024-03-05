@@ -4,7 +4,7 @@ DATABASE_CONNECTION_STRING = "postgresql://user_postgres:pass_postgres@localhost
 
 
 def get_connection():
-    """
-    ESTABLE Y DEVUELVE UNA CONEXIÓN A LA BASE DE DATOS
-    """
-    return connect(DATABASE_CONNECTION_STRING)
+    try:
+        return connect(DATABASE_CONNECTION_STRING)
+    except Exception as e:
+        raise e

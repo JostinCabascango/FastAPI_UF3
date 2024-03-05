@@ -40,3 +40,10 @@ def subcategory_exists(subcategory_id):
     with get_connection().cursor() as cursor:
         cursor.execute("SELECT * FROM public.subcategory WHERE subcategory_id = %s", (subcategory_id,))
         return bool(cursor.fetchone())
+
+
+async def create_or_update_subcategory(subcategory):
+    if not subcategory_exists(subcategory.subcategory_id):
+        create_subcategory(subcategory)
+    else:
+        update_subcategory(subcategory.subcategory_id, subcategory)
