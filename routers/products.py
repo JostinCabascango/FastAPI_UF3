@@ -84,7 +84,8 @@ async def put_product(id: int, product: ProductUpdate):
 @router.delete("/product/{id}", summary="Delete a product")
 async def delete_product(id: int):
     """Delete a product by its ID from the database."""
-    result = product_service.delete_product(id)
-    if not result["success"]:
-        raise HTTPException(status_code=404, detail=result["message"])
-    return {"message": "Product deleted successfully"}
+    try:
+        product_service.delete_product(id)
+        return ApiResponse(status=200, message="Product deleted successfully", data=True).convert_to_dict()
+    except Exception as e:
+        return ApiResponse(status=400, message=str(e), data=False).convert_to_dict()
