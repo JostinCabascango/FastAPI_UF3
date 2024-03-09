@@ -1,11 +1,30 @@
-# Test your FastAPI endpoints
+### Product endpoints
 
-GET http://127.0.0.1:8000/
-Accept: application/json
+### Get all products
+GET http://127.0.0.1:8000/products/products
 
-###
+### Get product by id
+GET http://127.0.0.1:8000/products/product/{id}
 
-GET http://127.0.0.1:8000/hello/User
-Accept: application/json
+### Create product
+POST http://127.0.0.1:8000/products/product
+```json
+{
+    "name": "Product 1",
+    "description": "Description 1",
+    "price": 100
+}
+```
 
-###
+### Update product
+PUT http://127.0.0.1:8000/products/{id}
+```json
+{
+    "name": "Product 1",
+    "description": "Description 1",
+    "price": 100
+}
+```
+
+### Delete product
+DELETE http://127.0.0.1:8000/products/{id}

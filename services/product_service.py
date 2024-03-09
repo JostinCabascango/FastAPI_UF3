@@ -58,13 +58,9 @@ def create_product(product: ProductInDB):
     """Create a new product in the database."""
     if not subcategory_exists(product.subcategory_id):
         raise Exception("Subcategory not found")
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    created_at = product.created_at if product.created_at else current_time
-    updated_at = product.updated_at if product.updated_at else current_time
-    query = "INSERT INTO public.product (name, description, company, price, units, subcategory_id, created_at, updated_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-    execute_query(query, (
-        product.name, product.description, product.company, product.price, product.units, product.subcategory_id,
-        created_at, updated_at))
+    query = "INSERT INTO public.product (name, description, company, price, units, subcategory_id, created_at, updated_at) VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW())"
+    execute_query(query, (product.name, product.description, product.company, product.price, product.units,
+                          product.subcategory_id))
 
 
 def product_exists(id: int) -> bool:
@@ -86,12 +82,11 @@ def update_product(id: int, product: ProductUpdate):
     try:
         if not product_exists(id) or not subcategory_exists(product.subcategory_id):
             raise Exception("Product or subcategory not found")
-        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        query = "UPDATE public.product SET name = %s, description = %s, company = %s, price = %s, units = %s, subcategory_id = %s, updated_at = %s WHERE product_id = %s"
+        query = "UPDATE public.product SET name = %s, description = %s, company = %s, price = %s, units = %s, subcategory_id = %s, updated_at = NOW() WHERE product_id = %s"
         rows_affected = execute_query(query, (
             product.name, product.description, product.company, product.price, product.units, product.subcategory_id,
-            current_time, id))
+            id))
 
         if rows_affected == 0:
             raise Exception("Update operation failed")
