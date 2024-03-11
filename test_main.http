@@ -4,27 +4,33 @@
 GET http://127.0.0.1:8000/products/products
 
 ### Get product by id
-GET http://127.0.0.1:8000/products/product/{id}
+GET http://127.0.0.1:8000//products/product/67
 
 ### Create product
 POST http://127.0.0.1:8000/products/product
-```json
+Content-Type: application/json
+
 {
-    "name": "Product 1",
-    "description": "Description 1",
-    "price": 100
+  "name": "Product Test",
+  "description": "Test Description",
+  "company": "Test Company",
+  "price": 200,
+  "units": 50,
+  "subcategory_id": 1
 }
-```
 
 ### Update product
-PUT http://127.0.0.1:8000/products/{id}
-```json
+PUT http://127.0.0.1:8000/products/product/67
+Content-Type: application/json
+
 {
-    "name": "Product 1",
-    "description": "Description 1",
-    "price": 100
+  "name": "Updated Product",
+  "description": "Updated Description",
+  "company": "Updated Company",
+  "price": 300,
+  "units": 60,
+  "subcategory_id": 1
 }
-```
 
 ### Delete product
-DELETE http://127.0.0.1:8000/products/{id}
+DELETE http://127.0.0.1:8000/products/product/67
