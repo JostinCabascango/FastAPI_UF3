@@ -1,0 +1,32 @@
+### Subcategory endpoints
+
+### Get all subcategories
+GET http://127.0.0.1:8000/subcategories/subcategories/
+
+### Get subcategory by id
+GET http://127.0.0.1:8000/subcategories/subcategory/1
+
+### Create subcategory
+POST http://127.0.0.1:8000/subcategories/subcategory/
+Content-Type: application/json
+
+{
+  "subcategory_id": 0,
+  "name": "post subcategory",
+  "category_id": 1
+}
+
+### Update subcategory
+PUT http://127.0.0.1:8000/subcategories/subcategory/6
+Content-Type: application/json
+
+{
+  "created_at": "string",
+  "updated_at": "string",
+  "subcategory_id": 0,
+  "name": "updated subcategory",
+  "category_id": 5
+}
+
+### Delete subcategory
+DELETE http://127.0.0.1:8000/subcategory/5

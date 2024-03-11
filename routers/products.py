@@ -12,7 +12,11 @@ router = APIRouter()
 @router.get("/products/", response_model=List[ProductInDB], summary="Get all products")
 async def get_products():
     """Fetch all products from the database."""
-    return product_service.fetch_products()
+    try:
+        products = product_service.fetch_products()
+        return products
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/product/{id}", response_model=ProductInDB, summary="Get a product by ID")
@@ -27,19 +31,28 @@ async def get_product(id: int):
 @router.get("/products/orderby/", summary="Get products ordered by price")
 async def get_products_orderby(orderby: str = Query(None, enum=["asc", "desc"])):
     """Fetch all products ordered by price from the database."""
-    return product_service.fetch_products_orderby(orderby)
+    try:
+        return product_service.fetch_products_orderby(orderby)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/products/contain/", summary="Get products that contain a string")
 async def get_products_contain(name: str):
     """Fetch all products that contain a given string in their name from the database."""
-    return product_service.fetch_products_contain(name)
+    try:
+        return product_service.fetch_products_contain(name)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/products/skip_limit/", summary="Get a range of products")
 async def get_products_skip_limit(skip: int, limit: int):
     """Fetch a range of products with skip and limit from the database."""
-    return product_service.fetch_products_skip_limit(skip, limit)
+    try:
+        return product_service.fetch_products_skip_limit(skip, limit)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 """POST /products/"""

@@ -4,7 +4,17 @@
 GET http://127.0.0.1:8000/products/products
 
 ### Get product by id
-GET http://127.0.0.1:8000//products/product/67
+GET http://127.0.0.1:8000//products/product/1001
+
+### Get products ordered by price
+GET http://127.0.0.1:8000/products/products/orderby/?orderby=asc
+
+### Get products that contain a string
+
+GET http://127.0.0.1:8000/products/products/contain/?name=LG
+
+### Get a range of products
+GET http://127.0.0.1:8000/products/products/skip_limit/?skip=10&limit=5
 
 ### Create product
 POST http://127.0.0.1:8000/products/product

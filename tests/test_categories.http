@@ -1,0 +1,28 @@
+### Category endpoints
+
+### Get all categories
+GET http://127.0.0.1:8000/categories/
+
+### Get category by id
+GET http://127.0.0.1:8000/category/1
+
+### Create category
+POST http://127.0.0.1:8000/categories/category/
+Content-Type: application/json
+
+{
+  "category_id": "5",
+  "name": "New Category"
+}
+
+### Update category
+PUT http://127.0.0.1:8000/categories/category/5
+Content-Type: application/json
+
+{
+  "category_id": "5",
+  "name": "Updated Category"
+}
+
+### Delete category
+DELETE http://127.0.0.1:8000/categories/category/5

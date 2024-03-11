@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 from fastapi import HTTPException
 from database import get_connection
-from models import ProductInDB, ProductUpdate, ProductSubcategoryCategory
+from models import ProductInDB, ProductUpdate, ProductSubcategoryCategory, ProductCreate
 
 
 def execute_query(query: str, params: tuple = None):
@@ -54,7 +54,7 @@ def fetch_product(id: int) -> ProductInDB:
     return create_product_from_data(data[0]) if data else None
 
 
-def create_product(product: ProductInDB):
+def create_product(product: ProductCreate):
     """Create a new product in the database."""
     if not subcategory_exists(product.subcategory_id):
         raise Exception("Subcategory not found")
