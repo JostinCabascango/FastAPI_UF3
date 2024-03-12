@@ -17,7 +17,7 @@ Content-Type: application/json
 }
 
 ### Update subcategory
-PUT http://127.0.0.1:8000/subcategories/subcategory/6
+PUT http://127.0.0.1:8000/subcategories/subcategory/44
 Content-Type: application/json
 
 {
@@ -29,4 +29,4 @@ Content-Type: application/json
 }
 
 ### Delete subcategory
-DELETE http://127.0.0.1:8000/subcategory/5
+DELETE http://127.0.0.1:8000/subcategories/subcategory/47

@@ -55,7 +55,7 @@ async def update_subcategory(subcategory_id: int, subcategory: Subcategory):
 @router.delete("/subcategory/{subcategory_id}", summary="Delete a subcategory")
 async def delete_subcategory(subcategory_id: int):
     """Delete a subcategory from the database."""
-    deletion_success = subcategory_service.delete_subcategory(subcategory_id)
-    if not deletion_success:
-        raise HTTPException(status_code=500, detail="Failed to delete subcategory.")
-    return {"message": "Subcategory deleted successfully"}
+    response = subcategory_service.delete_subcategory(subcategory_id)
+    if response['status'] == "failed":
+        raise HTTPException(status_code=404, detail=response['message'])
+    return {"message": response['message']}

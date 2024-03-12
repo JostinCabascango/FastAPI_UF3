@@ -80,13 +80,15 @@ def update_subcategory(subcategory_id: int, subcategory: Subcategory):
 
 def delete_subcategory(subcategory_id: int) -> Dict[str, str]:
     """Delete a subcategory from the database."""
-    query = "DELETE FROM public.subcategory WHERE subcategory_id = %s"
-    rows_affected = execute_delete_query(query, (subcategory_id,))
-
-    if rows_affected == 0:
-        response = ApiResponse("failed", "No changes were made", True)
+    if not subcategory_exists(subcategory_id):
+        response = ApiResponse("failed", "Subcategory not found", True)
     else:
-        response = ApiResponse("success", "Subcategory deleted successfully", False)
+        query = "DELETE FROM public.subcategory WHERE subcategory_id = %s"
+        rows_affected = execute_delete_query(query, (subcategory_id,))
+        if rows_affected == 0:
+            response = ApiResponse("failed", "No changes were made", True)
+        else:
+            response = ApiResponse("success", "Subcategory deleted successfully", False)
     return response.convert_to_dict()
 
 
