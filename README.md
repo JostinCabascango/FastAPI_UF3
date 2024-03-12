@@ -41,4 +41,4 @@ Este proyecto incluye las siguientes características:
 
 Puedes ver una demostración de cómo funcionan todos los endpoints en el siguiente video:
 
-[![Demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://drive.google.com/file/d/1BCYs31Y6SNdHEsFsGZ7GIKKZqkpXZx-R/view?usp=drive_link)
+[Ver Demo](https://drive.google.com/file/d/1BCYs31Y6SNdHEsFsGZ7GIKKZqkpXZx-R/view?usp=drive_link)
